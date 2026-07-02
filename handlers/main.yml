@@ -1,0 +1,7 @@
+---
+# handlers/main.yml — stratum_factory.bastion_users
+
+- name: restart sshd
+  ansible.builtin.service:
+    name: sshd
+    state: restarted

@@ -1,0 +1,52 @@
+---
+# tasks/main.yml — stratum_factory.bastion_users
+# All task module references use FQCN.
+
+- name: Create break-glass user
+  ansible.builtin.user:
+    name: "{{ bastion_breakglass_user }}"
+    shell: "{{ bastion_breakglass_shell }}"
+    create_home: true
+    groups: sudo
+    append: true
+    state: present
+
+- name: Install SSH authorized key for break-glass user
+  ansible.posix.authorized_key:
+    user: "{{ bastion_breakglass_user }}"
+    key: "{{ bastion_breakglass_ssh_key }}"
+    state: present
+    exclusive: true
+
+- name: Grant passwordless sudo to break-glass user
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ bastion_breakglass_user }}"
+    content: "{{ bastion_breakglass_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+  when: bastion_breakglass_sudo | bool
+
+- name: Create PAM/VPN users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    create_home: true
+    update_password: always
+    state: present
+  loop: "{{ bastion_vpn_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  no_log: true
+
+- name: Harden sshd — disable password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: "PasswordAuthentication {{ bastion_sshd_password_auth }}"
+    state: present
+    backup: true
+  when: bastion_sshd_harden | bool
+  notify: restart sshd

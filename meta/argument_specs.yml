@@ -1,0 +1,66 @@
+---
+# meta/argument_specs.yml — stratum_factory.bastion_users
+# Strict input validation. The wrapper must supply all REQUIRED variables.
+
+argument_specs:
+  main:
+    short_description: Manages break-glass SSH user and PAM/VPN users on the STRATUM bastion.
+    description:
+      - Provisions a break-glass admin account with an SSH authorized key and passwordless sudo.
+      - Provisions zero or more PAM/VPN Linux accounts used by ocserv.
+      - Optionally hardens sshd by disabling password authentication.
+    options:
+      bastion_breakglass_user:
+        type: str
+        default: stratum-admin
+        description: Username for the break-glass SSH account.
+
+      bastion_breakglass_ssh_key:
+        type: str
+        required: true
+        no_log: false
+        description: >
+          SSH public key string to install in the break-glass user's authorized_keys.
+          Must be supplied by the wrapper (from Vault or CI secrets). REQUIRED.
+
+      bastion_breakglass_shell:
+        type: str
+        default: /bin/bash
+        description: Login shell for the break-glass user.
+
+      bastion_breakglass_sudo:
+        type: bool
+        default: true
+        description: When true, installs a passwordless sudoers entry for the break-glass user.
+
+      bastion_vpn_users:
+        type: list
+        default: []
+        description: >
+          List of PAM/VPN user dicts. Each item must have 'name' and 'password' (pre-hashed).
+          'shell' is optional (defaults to /bin/bash).
+        elements: dict
+        options:
+          name:
+            type: str
+            required: true
+            description: Linux username for this VPN identity.
+          password:
+            type: str
+            required: true
+            no_log: true
+            description: Pre-hashed password string (SHA-512 or similar). Supplied from Vault.
+          shell:
+            type: str
+            default: /bin/bash
+            description: Login shell for this VPN user.
+
+      bastion_sshd_harden:
+        type: bool
+        default: true
+        description: When true, applies sshd hardening (disables password authentication).
+
+      bastion_sshd_password_auth:
+        type: str
+        default: "no"
+        description: Value for PasswordAuthentication in /etc/ssh/sshd_config.

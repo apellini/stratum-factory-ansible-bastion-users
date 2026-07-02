@@ -1,0 +1,32 @@
+---
+# defaults/main.yml — stratum_factory.bastion_users
+#
+# All inputs are supplied by the wrapper. No hardcoded secrets.
+
+# --- Break-glass SSH user -------------------------------------------------------
+# A last-resort / first-config local account with an SSH authorized key and
+# passwordless sudo. Password login is never enabled for this account.
+
+bastion_breakglass_user: stratum-admin
+bastion_breakglass_ssh_key: ""       # public key string — REQUIRED (validated in argument_specs)
+bastion_breakglass_shell: /bin/bash
+bastion_breakglass_sudo: true
+
+# --- PAM / VPN users ------------------------------------------------------------
+# ocserv uses PAM authentication, so each VPN identity is a Linux account.
+# Passwords must be supplied pre-hashed (e.g. from Vault / CI secrets).
+# Never commit plaintext passwords.
+#
+# Example item:
+#   - name: vpn-alice
+#     password: "$6$rounds=656000$salt$hash"   # SHA-512 hash, from vault
+#     shell: /bin/bash                          # optional, defaults to /bin/bash
+
+bastion_vpn_users: []
+
+# --- sshd hardening -------------------------------------------------------------
+# When true: disable password authentication and (optionally) restrict access
+# to the break-glass user or a designated group.
+
+bastion_sshd_harden: true
+bastion_sshd_password_auth: "no"

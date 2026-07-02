@@ -1,0 +1,49 @@
+---
+# molecule/default/verify.yml — stratum_factory.bastion_users
+
+- name: Verify
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Assert break-glass user exists
+      ansible.builtin.getent:
+        database: passwd
+        key: stratum-admin
+      register: breakglass_getent
+
+    - name: Fail if break-glass user not found
+      ansible.builtin.fail:
+        msg: "Break-glass user stratum-admin not found in /etc/passwd"
+      when: breakglass_getent.ansible_facts.getent_passwd['stratum-admin'] is not defined
+
+    - name: Assert authorized_keys file exists for break-glass user
+      ansible.builtin.stat:
+        path: /home/stratum-admin/.ssh/authorized_keys
+      register: authorized_keys_stat
+
+    - name: Fail if authorized_keys not present
+      ansible.builtin.fail:
+        msg: "authorized_keys not found for stratum-admin"
+      when: not authorized_keys_stat.stat.exists
+
+    - name: Assert sudoers file exists for break-glass user
+      ansible.builtin.stat:
+        path: /etc/sudoers.d/stratum-admin
+      register: sudoers_stat
+
+    - name: Fail if sudoers file not present
+      ansible.builtin.fail:
+        msg: "Sudoers file /etc/sudoers.d/stratum-admin not found"
+      when: not sudoers_stat.stat.exists
+
+    - name: Assert VPN test user exists
+      ansible.builtin.getent:
+        database: passwd
+        key: vpn-testuser
+      register: vpn_user_getent
+
+    - name: Fail if VPN test user not found
+      ansible.builtin.fail:
+        msg: "VPN user vpn-testuser not found in /etc/passwd"
+      when: vpn_user_getent.ansible_facts.getent_passwd['vpn-testuser'] is not defined

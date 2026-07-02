@@ -1,0 +1,23 @@
+---
+# molecule/default/converge.yml — stratum_factory.bastion_users
+
+- name: Converge
+  hosts: all
+  become: true
+
+  vars:
+    bastion_breakglass_user: stratum-admin
+    bastion_breakglass_ssh_key: >-
+      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAITestDummyKeyForMoleculeTestsOnlyNotForProduction molecule-test@localhost
+    bastion_breakglass_shell: /bin/bash
+    bastion_breakglass_sudo: true
+    bastion_vpn_users:
+      - name: vpn-testuser
+        # SHA-512 hash of "TestPassword123!" — for molecule testing only
+        password: "$6$rounds=656000$testmoleculesalt$3eFakeHashForTestingPurposesOnlyNeverUseInProduction"
+        shell: /bin/bash
+    bastion_sshd_harden: true
+    bastion_sshd_password_auth: "no"
+
+  roles:
+    - role: stratum_factory.bastion_users
