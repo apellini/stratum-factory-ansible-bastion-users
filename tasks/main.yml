@@ -49,4 +49,4 @@
     state: present
     backup: true
   when: bastion_sshd_harden | bool
-  notify: restart sshd
+  notify: Restart sshd
