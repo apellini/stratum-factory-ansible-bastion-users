@@ -39,6 +39,7 @@ ansible-galaxy collection install ansible.posix
 | `bastion_vpn_users` | `[]` | no | List of PAM/VPN user dicts (see below) |
 | `bastion_sshd_harden` | `true` | no | Apply sshd password-auth hardening |
 | `bastion_sshd_password_auth` | `"no"` | no | Value for `PasswordAuthentication` |
+| `bastion_sshd_service` | `"ssh"` | no | systemd unit name for the SSH daemon (`ssh` on Debian/Ubuntu; `sshd` on RHEL) |
 
 ### `bastion_vpn_users` item schema
 
