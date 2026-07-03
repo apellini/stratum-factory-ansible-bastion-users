@@ -30,3 +30,6 @@ bastion_vpn_users: []
 
 bastion_sshd_harden: true
 bastion_sshd_password_auth: "no"
+# systemd unit name for the SSH daemon. Debian/Ubuntu use "ssh";
+# RHEL/Fedora use "sshd". Override for RHEL-family bastions.
+bastion_sshd_service: ssh

@@ -3,5 +3,5 @@
 
 - name: Restart sshd
   ansible.builtin.service:
-    name: sshd
+    name: "{{ bastion_sshd_service }}"
     state: restarted

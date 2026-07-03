@@ -64,3 +64,10 @@ argument_specs:
         type: str
         default: "no"
         description: Value for PasswordAuthentication in /etc/ssh/sshd_config.
+
+      bastion_sshd_service:
+        type: str
+        default: ssh
+        description: >
+          systemd unit name of the SSH daemon. Debian/Ubuntu use "ssh";
+          RHEL/Fedora use "sshd". Override for RHEL-family bastions.
