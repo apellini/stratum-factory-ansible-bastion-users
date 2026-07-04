@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.3] - 2026-07-04
+
+### Fixed
+
+- Add fail-fast assert that `bastion_breakglass_ssh_key` is non-empty before the
+  `authorized_key` task. The task uses `exclusive: true`, so an empty key silently
+  wipes `authorized_keys` and locks out SSH. The assert now aborts the play with a
+  clear message explaining how to set `STRATUM_ADMIN_SSH_PUBKEY` when running the
+  playbook outside the harness.
+
 ## [0.1.2] - 2026-07-03
 
 ### Fixed

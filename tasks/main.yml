@@ -2,6 +2,19 @@
 # tasks/main.yml — stratum_factory.bastion_users
 # All task module references use FQCN.
 
+# authorized_key uses exclusive: true — an empty key wipes authorized_keys and
+# locks out SSH. Fail fast here rather than silently break bastion access.
+- name: Assert break-glass SSH key is non-empty
+  ansible.builtin.assert:
+    that:
+      - bastion_breakglass_ssh_key | length > 0
+    fail_msg: >-
+      bastion_breakglass_ssh_key is empty. Export STRATUM_ADMIN_SSH_PUBKEY before
+      running the playbook. The harness sets it automatically; running
+      ansible-playbook directly requires: STRATUM_ADMIN_SSH_PUBKEY=$(cat
+      .harness/keys/stratum-admin.pub) ansible-playbook site.yml
+    success_msg: "break-glass SSH key present ({{ bastion_breakglass_user }})"
+
 - name: Create break-glass user
   ansible.builtin.user:
     name: "{{ bastion_breakglass_user }}"
